@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StockCrate - Iniciar sesion</title>
+    <link rel="stylesheet" href="css/estilos.css" />
+    <style>
+      /* Estilos propios de la pagina de login, no van en el CSS general
+           porque esta pagina no usa el sidebar */
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1e3a5f 0%, #3b6fd4 100%);
+      }
+
+      .login-wrapper {
+        width: 100%;
+        max-width: 400px;
+        padding: 24px;
+      }
+
+      .login-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 44px 40px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+      }
+
+      .login-brand {
+        text-align: center;
+        margin-bottom: 32px;
+      }
+
+      .login-brand .brand-name {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1e3a5f;
+        letter-spacing: -0.4px;
+      }
+
+      .login-brand .brand-sub {
+        font-size: 13px;
+        color: #64748b;
+        margin-top: 4px;
+      }
+
+      .login-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1a202c;
+        margin-bottom: 24px;
+        text-align: center;
+      }
+
+      .login-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 16px;
+      }
+
+      .login-group label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #1a202c;
+      }
+
+      .login-group input {
+        padding: 11px 14px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 9px;
+        font-size: 14px;
+        color: #1a202c;
+        outline: none;
+        font-family: "Inter", sans-serif;
+        transition:
+          border-color 0.18s ease,
+          box-shadow 0.18s ease;
+      }
+
+      .login-group input:focus {
+        border-color: #3b6fd4;
+        box-shadow: 0 0 0 3px rgba(59, 111, 212, 0.12);
+      }
+
+      .login-group input::placeholder {
+        color: #94a3b8;
+      }
+
+      .btn-login {
+        width: 100%;
+        padding: 12px;
+        background: #3b6fd4;
+        color: #ffffff;
+        border: none;
+        border-radius: 9px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 8px;
+        font-family: "Inter", sans-serif;
+        transition:
+          background 0.18s ease,
+          transform 0.1s ease;
+      }
+
+      .btn-login:hover {
+        background: #2d5491;
+      }
+
+      .btn-login:active {
+        transform: scale(0.98);
+      }
+
+      .login-error {
+        display: none;
+        background: #fee2e2;
+        color: #991b1b;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 13px;
+        margin-bottom: 16px;
+        text-align: center;
+      }
+
+      .login-error.visible {
+        display: block;
+      }
+
+      .login-footer {
+        text-align: center;
+        margin-top: 24px;
+        font-size: 12px;
+        color: #94a3b8;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-wrapper">
+      <div class="login-card">
+        <div class="login-brand">
+          <div class="brand-name">StockCrate</div>
+          <div class="brand-sub">Sistema de Gestion de Inventarios</div>
+        </div>
+
+        <div class="login-title">Iniciar sesion</div>
+
+        <div class="login-error" id="login-error">
+          Usuario o contrasena incorrectos.
+        </div>
+
+        <div id="form-login">
+          <div class="login-group">
+            <label for="correo">Correo electronico</label>
+            <input
+              type="email"
+              id="correo"
+              placeholder="admin@stockcrate.com"
+              autocomplete="email"
+            />
+          </div>
+
+          <div class="login-group">
+            <label for="password">Contrasena</label>
+            <input
+              type="password"
+              id="password"
+              placeholder="Tu contrasena"
+              autocomplete="current-password"
+            />
+          </div>
+
+          <button class="btn-login" onclick="iniciarSesion()">Entrar</button>
+        </div>
+
+        <div class="login-footer">Version 1.0</div>
+      </div>
+    </div>
+
+    <script>
+      // Por ahora valido con credenciales de prueba porque el backend
+      // todavia no tiene endpoint de login. Cuando este listo solo
+      // hay que reemplazar el bloque de validacion por un fetch.
+      const USUARIOS_PRUEBA = [
+        {
+          correo: "admin@stockcrate.com",
+          password: "admin123",
+          rol: "admin",
+          nombre: "Administrador",
+        },
+        {
+          correo: "empleado@stockcrate.com",
+          password: "123456",
+          rol: "empleado",
+          nombre: "Empleado",
+        },
+      ];
+
+      function iniciarSesion() {
+        const correo = document.getElementById("correo").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const error = document.getElementById("login-error");
+
+        if (!correo || !password) {
+          error.textContent = "Por favor completa todos los campos.";
+          error.classList.add("visible");
+          return;
+        }
+
+        const usuario = USUARIOS_PRUEBA.find(
+          (u) => u.correo === correo && u.password === password,
+        );
+
+        if (usuario) {
+          // Guardo la sesion en localStorage para que index.html la lea
+          localStorage.setItem(
+            "sesion",
+            JSON.stringify({
+              correo: usuario.correo,
+              rol: usuario.rol,
+              nombre: usuario.nombre,
+            }),
+          );
+          window.location.href = "index.html";
+        } else {
+          error.textContent = "Usuario o contrasena incorrectos.";
+          error.classList.add("visible");
+          document.getElementById("password").value = "";
+          document.getElementById("password").focus();
+        }
+      }
+
+      // Permitir presionar Enter para enviar
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") iniciarSesion();
+      });
+    </script>
+  </body>
+</html>
